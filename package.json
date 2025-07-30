@@ -1,0 +1,27 @@
+{
+  "name": "avia-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for managing travel bookings with MongoDB storage",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "mongodb": "^5.7.0",
+    "mongoose": "^8.16.5",
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "mongodb",
+    "booking"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
