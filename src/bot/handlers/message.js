@@ -58,6 +58,10 @@ const messageHandler = async (msg) => {
 
   // Step: client_contact
   if (checkState("client_contact")) {
+    if (!text) {
+      return await reply(texts.invalidData, createCancelMenu());
+    }
+
     await setState(chatId, {
       ...state.data,
       name: "direction",
@@ -129,7 +133,7 @@ const messageHandler = async (msg) => {
     if (!matches(texts.done)) return;
 
     if (!state.data.documents || state.data.documents?.length === 0) {
-      await reply(texts.uploadAtLeastOneDocument, createConfirmationKeyboard());
+      await reply(texts.uploadAtLeastOneDocument, createConfirmationMenu());
       return;
     }
 
@@ -146,7 +150,7 @@ const messageHandler = async (msg) => {
 
   // Step: confirmation
   if (checkState("confirmation")) {
-    if (!matches(texts.confirm)) return;
+    if (!matches(texts.confirmAndSave)) return;
 
     const { date, adminName, direction, documents, price, clientContact } =
       state.data;
@@ -156,6 +160,7 @@ const messageHandler = async (msg) => {
       direction,
       documents,
       clientContact,
+      addedBy: chatId,
       admin: adminName,
       price: parseInt(price) || 0,
     };

@@ -144,7 +144,7 @@ const createConfirmationKeyboard = () => ({
   reply_markup: {
     resize_keyboard: true,
     one_time_keyboard: true,
-    keyboard: [[texts.confirm], [texts.cancel]],
+    keyboard: [[texts.confirmAndSave], [texts.cancel]],
   },
 });
 

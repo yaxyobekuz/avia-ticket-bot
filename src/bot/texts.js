@@ -20,6 +20,7 @@ const texts = {
   selectDirection: `✈️ Iltimos, yo'nalishni tanlang:`,
   invalidDate: `❌ Iltimos, klaviaturadan to'g'ri sanani tanlang.`,
   invalidPrice: `❌ Iltimos, klaviaturadan to'g'ri narxni tanlang.`,
+  invalidData: `❌ Iltimos, mijoz ma'lumotlarini to'g'ri kiriting.`,
   invalidDirection: `❌ Iltimos, klaviaturadan to'g'ri yo'nalishni tanlang.`,
   uploadAtLeastOneDocument: `❌ Davom etishdan oldin kamida bitta hujjat yuklang.`,
   documentUploadError: `❌ Hujjatni yuklashda xatolik. Iltimos, qaytadan urinib ko'ring.`,

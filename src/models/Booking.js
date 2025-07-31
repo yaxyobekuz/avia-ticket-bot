@@ -4,6 +4,7 @@ const bookingSchema = new mongoose.Schema({
   date: { type: String, required: true },
   price: { type: Number, required: true },
   admin: { type: String, required: true },
+  addedBy: { type: Number, required: true },
   documents: { type: Array, required: true },
   direction: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
