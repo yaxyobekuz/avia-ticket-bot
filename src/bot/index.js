@@ -31,4 +31,4 @@ bot.onText(/📊 Statistikani Ko'rish/, statsCommand);
 bot.on("message", messageHandler);
 
 // // Listen photo messages
-// bot.on("photo", photoHandler);
+bot.on("photo", photoHandler);

@@ -1,60 +1,61 @@
+const channelId = process.env.PRIVATE_CHANNEL_ID;
+const channelUrl = process.env.PRIVATE_CHANNEL_URL;
+
+// Texts
+const texts = require("../texts");
+
 // Helpers
 const {
   isAdmin,
-  isOwner,
   getState,
   setState,
-  clearState,
-  getAllowedDates,
-  generateBookingPreview,
-  getFormattedCurrentTime,
+  generateTicketPhotoPreview,
 } = require("../../utils/helpers");
+
+// Models
+const Admin = require("../../models/Admin");
+
+// Hooks
+const useMessage = require("../hooks/useMessage");
 
 const photoHandler = async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
+  const isAdminUser = await isAdmin(chatId);
+  const { reply, sendPhoto } = useMessage(chatId);
 
-  if (!(await isAdmin(userId))) return;
+  // Check if the user is not an admin
+  if (!isAdminUser) return;
 
+  // Check if the user is an admin
   const state = await getState(userId);
-  if (!state || state.step !== "documents") return;
+
+  if (!state || state.name !== "documents") return;
 
   try {
     // Eng yuqori sifatli rasmni olish
     const photo = msg.photo[msg.photo.length - 1];
-    const fileId = photo.file_id;
+
+    // Get admin
+    const admin = await Admin.findOne({ userId: chatId });
 
     // Rasmni maxfiy kanalga yo'naltirish
-    const forwardedMsg = await bot.forwardMessage(
+    const sendedPhoto = await sendPhoto(
       channelId,
-      chatId,
-      msg.message_id
+      photo.file_id,
+      generateTicketPhotoPreview(state, admin.name)
     );
 
-    // Fayl havolasini yaratish
-    const channelUsername = channelId.replace("@", "");
-    const fileLink = `https://t.me/${channelUsername}/${forwardedMsg.message_id}`;
+    const postLink = `${channelUrl}/${sendedPhoto.message_id}`;
+    const doc = { postLink, channelMessageId: sendedPhoto.message_id };
 
-    // Hujjat ma'lumotlarini holatga qo'shish
-    const documentInfo = {
-      fileName: `Hujjat_${Date.now()}.jpg`,
-      channelMessageId: forwardedMsg.message_id,
-      fileLink: fileLink,
-    };
+    const updatedDocs = [...(state.data?.documents || []), doc];
+    await setState(userId, { ...state.data, documents: updatedDocs });
 
-    const updatedDocuments = [...(state.documents || []), documentInfo];
-    await setState(userId, { ...state, documents: updatedDocuments });
-
-    await bot.sendMessage(
-      chatId,
-      `✅ Hujjat muvaffaqiyatli yuklandi! (Jami ${updatedDocuments.length} ta fayl)\nQo'shimcha hujjatlar yuboring yoki davom etish uchun "tayyor" deb yozing.`
-    );
+    await reply(texts.documentUploaded(updatedDocs.length));
   } catch (error) {
-    console.error("Rasmni ishlashda xatolik:", error);
-    await bot.sendMessage(
-      chatId,
-      "❌ Hujjatni yuklashda xatolik. Iltimos, qaytadan urinib ko'ring."
-    );
+    console.error("Rasmni yuklashda xatolik:", error);
+    await reply(texts.documentUploadError);
   }
 };
 
