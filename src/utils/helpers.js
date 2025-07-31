@@ -162,19 +162,32 @@ const getFormattedCurrentTime = () => {
 
 // Generate booking preview text
 const generateBookingPreview = (state, adminName) => {
-  const documentsCount = state.documents ? state.documents.length : 0;
+  const { documents, clientContact, date, direction, price } = state.data;
+  const documentsCount = documents ? documents.length : 0;
 
-  return `📋 <b>Bron Ma'lumotlari Ko'rinishi</b>
+  return `📋 <b>Chipta Ma'lumotlari Ko'rinishi</b>
 
 <b>Admin:</b> ${adminName}
-<b>Mijoz:</b> ${state.clientContact}
-<b>Sana:</b> ${state.date}
-<b>Yo'nalish:</b> ${state.direction}
-<b>Narx:</b> ${state.price}
+<b>Mijoz:</b> ${clientContact}
+<b>Sana:</b> ${date}
+<b>Yo'nalish:</b> ${direction}
+<b>Narx:</b> ${price}
 <b>Hujjatlar:</b> ${documentsCount} ta fayl yuklandi
 <b>Yaratilgan Vaqt:</b> ${getFormattedCurrentTime()}
 
 Yuqoridagi ma'lumotlarni ko'rib chiqing. Hammasi to'g'rimi?`;
+};
+
+// Generate ticket photo preview text
+const generateTicketPhotoPreview = (state, adminName) => {
+  const { clientContact, date, direction, price } = state.data || {};
+
+  return `<b>Admin:</b> ${adminName}
+<b>Mijoz:</b> ${clientContact}
+<b>Sana:</b> ${date}
+<b>Yo'nalish:</b> ${direction}
+<b>Narx:</b> ${price}
+<b>Yaratilgan Vaqt:</b> ${getFormattedCurrentTime()}`;
 };
 
 module.exports = {
@@ -193,5 +206,6 @@ module.exports = {
   createConfirmationMenu,
   createDirectionKeyboard,
   getFormattedCurrentTime,
+  generateTicketPhotoPreview,
   createConfirmationKeyboard,
 };
