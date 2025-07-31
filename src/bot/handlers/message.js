@@ -128,8 +128,8 @@ const messageHandler = async (msg) => {
   if (checkState("documents")) {
     if (!matches(texts.done)) return;
 
-    if (!state.documents || state.documents?.length === 0) {
-      await reply(texts.uploadAtLeastOneDocument, createConfirmationMenu());
+    if (!state.data.documents || state.data.documents?.length === 0) {
+      await reply(texts.uploadAtLeastOneDocument, createConfirmationKeyboard());
       return;
     }
 
@@ -146,16 +146,18 @@ const messageHandler = async (msg) => {
 
   // Step: confirmation
   if (checkState("confirmation")) {
-    if (!matches(texts.confirmAndSave)) return;
+    if (!matches(texts.confirm)) return;
 
-    // Ma'lumotlar bazasiga saqlash - clientName ni olib tashladik
+    const { date, adminName, direction, documents, price, clientContact } =
+      state.data;
+
     const booking = {
-      date: state.date,
-      admin: state.adminName,
-      direction: state.direction,
-      documents: state.documents || [],
-      price: parseInt(state.price) || 0,
-      clientContact: state.clientContact,
+      date,
+      direction,
+      documents,
+      clientContact,
+      admin: adminName,
+      price: parseInt(price) || 0,
     };
 
     await Booking.create(booking);

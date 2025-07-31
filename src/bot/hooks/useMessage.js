@@ -15,8 +15,8 @@ const useMessage = (chatId, targetMessage) => {
     });
   };
 
-  const sendFile = async (fileUrl, caption) => {
-    await bot.sendDocument(chatId, fileUrl, {
+  const sendPhoto = async (chatId, photoUrl, caption) => {
+    return await bot.sendPhoto(chatId, photoUrl, {
       caption,
       parse_mode: "HTML",
     });
@@ -27,7 +27,7 @@ const useMessage = (chatId, targetMessage) => {
     return input.trim().toLowerCase() === targetMessage.trim().toLowerCase();
   };
 
-  return { reply, matches, sendFile };
+  return { reply, matches, sendPhoto };
 };
 
 module.exports = useMessage;
