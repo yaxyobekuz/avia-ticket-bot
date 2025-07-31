@@ -22,8 +22,12 @@ const texts = {
   invalidPrice: `❌ Iltimos, klaviaturadan to'g'ri narxni tanlang.`,
   invalidDirection: `❌ Iltimos, klaviaturadan to'g'ri yo'nalishni tanlang.`,
   uploadAtLeastOneDocument: `❌ Davom etishdan oldin kamida bitta hujjat yuklang.`,
+  documentUploadError: `❌ Hujjatni yuklashda xatolik. Iltimos, qaytadan urinib ko'ring.`,
   get sendDocuments() {
     return `📎 Iltimos, hujjatlarni (rasmlarni) yuboring. Tugagach, <b>${this.done}</b> deb yozing:`;
+  },
+  documentUploaded: (docsCount) => {
+    return `✅ Hujjat muvaffaqiyatli yuklandi! (Jami ${docsCount} ta fayl)\nQo'shimcha hujjatlar yuboring yoki davom etish uchun <b>${texts.done}</b> deb yozing.`;
   },
 };
 
