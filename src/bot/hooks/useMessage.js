@@ -15,6 +15,13 @@ const useMessage = (chatId, targetMessage) => {
     });
   };
 
+  const copyMessage = async (channelId, messageId, options = {}) => {
+    return await bot.copyMessage(chatId, channelId, messageId, {
+      parse_mode: "HTML",
+      ...options,
+    });
+  };
+
   const sendPhoto = async (chatId, photoUrl, caption) => {
     return await bot.sendPhoto(chatId, photoUrl, {
       caption,
@@ -27,7 +34,7 @@ const useMessage = (chatId, targetMessage) => {
     return input.trim().toLowerCase() === targetMessage.trim().toLowerCase();
   };
 
-  return { reply, matches, sendPhoto };
+  return { reply, matches, sendPhoto, copyMessage };
 };
 
 module.exports = useMessage;
