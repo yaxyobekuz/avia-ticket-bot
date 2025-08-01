@@ -6,7 +6,7 @@ const AdminState = require("../models/AdminState");
 
 // Check admin
 const isAdmin = async (userId) => {
-  return (await Admin.findOne({ userId })) !== null;
+  return await Admin.exists({ userId });
 };
 
 // Check owner
@@ -77,6 +77,19 @@ const createCancelMenu = () => ({
   reply_markup: {
     resize_keyboard: true,
     keyboard: [[texts.cancel]],
+  },
+});
+
+// Creates cancel operation keyboard
+const createBookingInfoMenu = () => ({
+  reply_markup: {
+    resize_keyboard: true,
+    keyboard: [
+      [texts.ticketInfo],
+      [texts.ticketFiles],
+      [texts.ticketFilesWithoutInfo],
+      [texts.cancel],
+    ],
   },
 });
 
@@ -178,16 +191,30 @@ const generateBookingPreview = (state, adminName) => {
 Yuqoridagi ma'lumotlarni ko'rib chiqing. Hammasi to'g'rimi?`;
 };
 
-// Generate ticket photo preview text
-const generateTicketPhotoPreview = (state, adminName) => {
-  const { clientContact, date, direction, price } = state.data || {};
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
 
-  return `<b>Admin:</b> ${adminName}
+// Generate ticket photo preview text
+const generateTicketPhotoPreview = (
+  state,
+  adminName,
+  withDocsCount = false
+) => {
+  const { clientContact, date, direction, price, documents } = state.data || {};
+
+  let text = `<b>Admin:</b> ${adminName}
 <b>Mijoz:</b> ${clientContact}
 <b>Sana:</b> ${date}
 <b>Yo'nalish:</b> ${direction}
 <b>Narx:</b> ${price}
 <b>Yaratilgan Vaqt:</b> ${getFormattedCurrentTime()}`;
+
+  if (withDocsCount) {
+    text += `\n<b>Hujjatlar:</b> ${documents.length} ta fayl`;
+  }
+
+  return text;
 };
 
 module.exports = {
@@ -196,12 +223,14 @@ module.exports = {
   getState,
   setState,
   clearState,
+  escapeRegExp,
   createMainMenu,
   getAllowedDates,
   createOwnerMenu,
   createCancelMenu,
   createDateKeyboard,
   createPriceKeyboard,
+  createBookingInfoMenu,
   generateBookingPreview,
   createConfirmationMenu,
   createDirectionKeyboard,

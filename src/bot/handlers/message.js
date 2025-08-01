@@ -1,3 +1,5 @@
+const appsScriptUrl = process.env.APPS_SCRIPT_URL;
+
 // Texts
 const texts = require("../texts");
 
@@ -17,6 +19,7 @@ const {
   generateBookingPreview,
   createDirectionKeyboard,
   createConfirmationKeyboard,
+  createBookingInfoMenu,
 } = require("../../utils/helpers");
 
 // Models
@@ -26,6 +29,9 @@ const Booking = require("../../models/Booking");
 
 // Hooks
 const useMessage = require("../hooks/useMessage");
+
+// Services
+const { GoogleSheetsService } = require("../../services/googleSheets");
 
 const messageHandler = async (msg) => {
   const text = msg.text;
@@ -55,6 +61,17 @@ const messageHandler = async (msg) => {
   // If no state, return
   if (!state) return;
   const checkState = (targetName) => state.name === targetName;
+
+  // Step: booking_info
+  if (
+    checkState("booking_info") &&
+    !matches(texts.ticketInfo) &&
+    !matches(texts.ticketFiles) &&
+    !matches(texts.ticketFilesWithoutInfo)
+  ) {
+    if (text?.startsWith("/start")) return;
+    return await reply(texts.invalidKeyboard, createBookingInfoMenu());
+  }
 
   // Step: client_contact
   if (checkState("client_contact")) {
@@ -151,11 +168,12 @@ const messageHandler = async (msg) => {
   // Step: confirmation
   if (checkState("confirmation")) {
     if (!matches(texts.confirmAndSave)) return;
+    const menu = isOwner(chatId) ? createOwnerMenu : createMainMenu;
 
     const { date, adminName, direction, documents, price, clientContact } =
       state.data;
 
-    const booking = {
+    const bookingData = {
       date,
       direction,
       documents,
@@ -165,11 +183,22 @@ const messageHandler = async (msg) => {
       price: parseInt(price) || 0,
     };
 
-    await Booking.create(booking);
-    await clearState(chatId);
+    // Save to database
+    Booking.create(bookingData).then(async (savedBooking) => {
+      // Save to Google Sheets
+      const sheetsService = new GoogleSheetsService(appsScriptUrl);
+      sheetsService
+        .writeBookingToSheets({
+          ...bookingData,
+          id: savedBooking._id,
+          createdAt: savedBooking.createdAt,
+        })
+        .then(() => reply(texts.ticketSavedToSheets))
+        .catch(() => reply(texts.ticketSavedErrorInSheets));
 
-    const menu = isOwner(chatId) ? createOwnerMenu : createMainMenu;
-    return await reply(texts.ticketSaved, menu());
+      await clearState(chatId);
+      await reply(texts.ticketSaved, menu());
+    });
   }
 };
 
